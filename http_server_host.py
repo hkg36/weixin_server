@@ -122,10 +122,11 @@ class WeiXin(object):
         lat=float(doc.xpath(r'//xml/Location_X/text()',smart_strings=False)[0])
         long=float(doc.xpath(r'//xml/Location_Y/text()',smart_strings=False)[0])
         scale=int(doc.xpath(r'//xml/Scale/text()',smart_strings=False)[0])
+        label=doc.xpath(r'//xml/Label/text()',smart_strings=False)[0]
 
         new_root=self._buildReplyBase()
         etree.SubElement(new_root,'MsgType').text=etree.CDATA('text')
-        etree.SubElement(new_root,'Content').text=etree.CDATA('lat %.6f long %.6f %d'%(lat,long,scale))
+        etree.SubElement(new_root,'Content').text=etree.CDATA('lat %.6f long %.6f %d %s'%(lat,long,scale,label))
         return new_root
     def On_event_location(self,doc):
         """<Latitude>23.137466</Latitude>
@@ -146,6 +147,6 @@ class WeiXin(object):
 urls = (
     '/weixin', WeiXin,
     )
+webapp=web.application(urls, globals())
 if __name__ == '__main__' :
-    webapp=web.application(urls, globals())
     webapp.run()

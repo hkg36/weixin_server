@@ -4,11 +4,8 @@ from sqlalchemy.orm import sessionmaker,Session
 import redis
 import memcache
 import qiniu.conf
-class AutoSession(Session):
-    def __enter__(self):
-        return self
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close()
+from datamodel.sqlalchemy_tool import AutoSession
+
 db=create_engine("mysql://root:123456@192.173.1.213:4040/site?charset=utf8",pool_recycle=60,echo=True)
 DBBase=declarative_base(name="DBBase")
 #Session = sessionmaker(bind=db)

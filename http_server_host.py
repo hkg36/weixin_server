@@ -26,6 +26,13 @@ class WeiXin(object):
             return inputs.echostr
         return 'some error'
     def POST(self):
+        inputs=web.input()
+        tmpArr=[self.token,inputs.timestamp,inputs.nonce]
+        tmpArr.sort()
+        s=hashlib.sha1()
+        s.update(''.join(tmpArr))
+        if s.hexdigest()!=inputs.signature:
+            return
         data=web.data()
         doc=etree.fromstring(data, parser=utf8_parser)
         msg_type=doc.xpath(r'//xml/MsgType/text()',smart_strings=False)

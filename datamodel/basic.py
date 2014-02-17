@@ -7,6 +7,8 @@ from sqlalchemy import *
 from sqlalchemy.orm import sessionmaker
 from datamodel.sqlalchemy_tool import AutoSession
 import time
+import pycurl
+from cStringIO import StringIO
 
 register_openers()
 
@@ -48,6 +50,48 @@ def GetFile(token,media_id):
     request = urllib2.Request("http://file.api.weixin.qq.com/cgi-bin/media/get?access_token=%s&media_id=%s"%(token,media_id))
     data=urllib2.urlopen(request).read()
     return data
+def SendMessage(token,json_message):
+    crl = pycurl.Curl()
+    crl.setopt(pycurl.FOLLOWLOCATION, 0)
+    crl.setopt(pycurl.MAXREDIRS, 5)
+    crl.setopt(pycurl.ENCODING,"gzip,deflate")
+    crl.setopt(pycurl.POST, 1)
+    crl.setopt(pycurl.POSTFIELDS,  json.dumps(json_message,ensure_ascii=False).encode('utf-8'))
+    crl.setopt(pycurl.CONNECTTIMEOUT, 6)
+    crl.setopt(pycurl.TIMEOUT, 15)
+    crl.setopt(pycurl.SSL_VERIFYPEER,False)
+    crl.fp = StringIO()
+    crl.setopt(pycurl.URL, ("https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=%s"%token).encode('utf-8'))
+    crl.setopt(crl.WRITEFUNCTION, crl.fp.write)
+    crl.perform()
+    res_code=crl.getinfo(pycurl.HTTP_CODE)
+    res_body=json.loads(crl.fp.getvalue())
+    crl.close()
+    return res_body
+def DeleteMemu(token):
+    req=urllib2.Request('https://api.weixin.qq.com/cgi-bin/menu/delete?access_token=%s'%token)
+    return urllib2.urlopen(req).read()
+def SetMenu(token,menu_json):
+    url = 'https://api.weixin.qq.com/cgi-bin/menu/create?access_token=%s'%token
+    crl = pycurl.Curl()
+    crl.setopt(pycurl.FOLLOWLOCATION, 1)
+    crl.setopt(pycurl.MAXREDIRS, 5)
+    crl.setopt(pycurl.AUTOREFERER,1)
+    crl.setopt(pycurl.SSL_VERIFYHOST,0)
+    crl.setopt(pycurl.SSL_VERIFYPEER,0)
+
+    crl.setopt(pycurl.CONNECTTIMEOUT, 60)
+    crl.setopt(pycurl.TIMEOUT, 300)
+    #crl.setopt(pycurl.PROXY,proxy)
+    crl.setopt(pycurl.HTTPPROXYTUNNEL,1)
+    crl.fp = StringIO()
+    crl.setopt(crl.POSTFIELDS,  json.dumps(menu_json,ensure_ascii=False).encode('utf-8'))
+    crl.setopt(pycurl.URL, url.encode('utf-8'))
+    crl.setopt(crl.WRITEFUNCTION, crl.fp.write)
+    crl.perform()
+
+    return json.loads(crl.fp.getvalue())
+
 if __name__ == '__main__' :
     token=GetAccessToken()
     print(token)

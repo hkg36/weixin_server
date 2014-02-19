@@ -51,6 +51,9 @@ def GetFile(token,media_id):
     data=urllib2.urlopen(request).read()
     return data
 def SendMessage(token,json_message):
+    """
+    http://mp.weixin.qq.com/wiki/index.php?title=%E5%8F%91%E9%80%81%E5%AE%A2%E6%9C%8D%E6%B6%88%E6%81%AF
+    """
     crl = pycurl.Curl()
     crl.setopt(pycurl.FOLLOWLOCATION, 0)
     crl.setopt(pycurl.MAXREDIRS, 5)
@@ -91,7 +94,33 @@ def SetMenu(token,menu_json):
     crl.perform()
 
     return json.loads(crl.fp.getvalue())
-
+def GetUserInfo(token,openid):
+    request = urllib2.Request("https://api.weixin.qq.com/cgi-bin/user/info?access_token=%s&openid=%s&lang=zh_CN"%(token,openid))
+    data=json.loads(urllib2.urlopen(request).read())
+    return data
+def GetUserWatch(token):
+    all_follow=set()
+    next_openid=''
+    while True:
+        request = urllib2.Request("https://api.weixin.qq.com/cgi-bin/user/get?access_token=%s&next_openid=%s"%(token,next_openid))
+        data=json.loads(urllib2.urlopen(request).read())
+        if data['count']==0:
+            break
+        next_openid=data.get('next_openid','')
+        openidlist=data['data']['openid']
+        all_follow.update(openidlist)
+        if next_openid=='':
+            break
+    return all_follow
+def CreateQRCode(token,scene_id,expire_seconds=None):
+    if expire_seconds:
+        postdata={"expire_seconds": expire_seconds, "action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": scene_id}}}
+    else:
+        postdata={"action_name": "QR_LIMIT_SCENE", "action_info": {"scene": {"scene_id": scene_id}}}
+    request = urllib2.Request("https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=%s"%(token),json.dumps(postdata))
+    data=json.loads(urllib2.urlopen(request).read())
+    ticket=data['ticket']
+    return "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=%s"%ticket
 if __name__ == '__main__' :
     token=GetAccessToken()
     print(token)

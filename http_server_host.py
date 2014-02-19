@@ -9,6 +9,7 @@ from datamodel.location import WeixinLocation
 from datamodel.user import WeixinUser
 import dbconfig
 import tools.helper
+import re
 
 HOSTNAME='weixin.haomeiniu.com'
 
@@ -61,14 +62,15 @@ class WeiXin(object):
         elif event=="LOCATION":
             return self.On_event_location(doc)
         elif event=='subscribe':
-            return self.On_event_subscribe()
+            return self.On_event_subscribe(doc)
         elif event=='unsubscribe':
             return self.On_event_unsubscribe()
+        elif event=='SCAN':
+            return self.On_event_scan(doc)
     def on_menu_ABOUT(self):
         new_root=self._buildReplyBase()
         etree.SubElement(new_root,'MsgType').text=etree.CDATA('text')
-        etree.SubElement(new_root,'Content').text=etree.CDATA(u'功能还在建设中')
-
+        etree.SubElement(new_root,'Content').text=etree.CDATA(u'功能还在建设中<a href="http://www.baidu.com">百度首页</a>')
         return new_root
     def on_menu_PIC(self):
         new_root=self._buildReplyBase()
@@ -88,7 +90,7 @@ class WeiXin(object):
         etree.SubElement(music,'MusicUrl').text=etree.CDATA('http://%s/static/music01.mp3'%HOSTNAME)
         etree.SubElement(music,'HQMusicUrl').text=etree.CDATA('http://%s/static/music01.mp3'%HOSTNAME)
         return new_root
-    def On_event_subscribe(self):
+    def On_event_subscribe(self,doc):
         with dbconfig.Session() as session:
             weixin_user=WeixinUser()
             weixin_user.openid=self.from_user
@@ -96,9 +98,16 @@ class WeiXin(object):
             weixin_user.subscribe=1
             session.merge(weixin_user)
             session.commit()
+        scenceid=0
+        eventkey=doc.xpath(r"/xml/EventKey/text()",smart_strings=False)
+        if eventkey:
+            match=re.match(r'qrscene_(?P<code>\d+)',eventkey[0])
+            if match:
+                scenceid=int(match.group('code'))
+                print(scenceid)
         new_root=self._buildReplyBase()
         etree.SubElement(new_root,'MsgType').text=etree.CDATA('text')
-        etree.SubElement(new_root,'Content').text=etree.CDATA(u'感谢您关注现场加,功能开发中,请期待')
+        etree.SubElement(new_root,'Content').text=etree.CDATA(u'感谢您关注现场加,功能开发中,请期待(scenceid=%d)'%scenceid)
         return new_root
     def On_event_unsubscribe(self):
         with dbconfig.Session() as session:
@@ -151,6 +160,18 @@ class WeiXin(object):
             wloc.geokey=tools.helper.CombineGeo(long,lat)
             session.merge(wloc)
             session.commit()
+    def On_event_scan(self,doc):
+        scenceid=int(doc.xpath(r'/xml/EventKey/text()',smart_strings=False)[0])
+        new_root=self._buildReplyBase()
+        etree.SubElement(new_root,'MsgType').text=etree.CDATA('text')
+        etree.SubElement(new_root,'Content').text=etree.CDATA(u'扫描二维码(scenceid=%d)'%scenceid)
+        return new_root
+    def on_voice(self,doc):
+        text=doc.xpath(r'/xml/Recognition/text()',smart_strings=False)[0]
+        new_root=self._buildReplyBase()
+        etree.SubElement(new_root,'MsgType').text=etree.CDATA('text')
+        etree.SubElement(new_root,'Content').text=etree.CDATA(u'你想说:%s'%text)
+        return new_root
 urls = (
     '/weixin', WeiXin,
     )

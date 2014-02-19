@@ -8,7 +8,7 @@ print(token)
 #data=GetFile(token,data)
 #print(data)
 
-msgbody={
+"""msgbody={
     "touser":'oSqzEjq0iMnEG0JurYFi9blHV1zk',
     "msgtype":"text",
     "text":
@@ -18,4 +18,8 @@ msgbody={
 }
 
 data=SendMessage(token,msgbody)
-print(data)
+print(data)"""
+
+print GetUserInfo(token,'oSqzEjq0iMnEG0JurYFi9blHV1zk')
+print GetUserWatch(token)
+print CreateQRCode(token,456,1800)

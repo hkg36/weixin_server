@@ -59,33 +59,9 @@ menu_body= {
             } ]
        },
       {
-           "name":u"微型杂志",
-           "sub_button":[
-            {
-               "type":"click",
-               "name":u"宝贝故事(1)",
-               "key":"ABOUT"
-            },
-             {
-               "type":"click",
-               "name":u"宝贝故事(2)",
-               "key":"ABOUT"
-            },
-              {
-               "type":"click",
-               "name":u"宝贝故事(3)",
-               "key":"ABOUT"
-            },
-               {
-               "type":"click",
-               "name":u"宝贝故事(4)",
-               "key":"ABOUT"
-            },
-              {
-               "type":"click",
-               "name":u"童言无忌",
-               "key":"ABOUT"
-            }]
+           "name":u"高端社区",
+               "type":"view",
+               "url":"http://quan.qgc.qq.com/177147127"
        }]
  }
 

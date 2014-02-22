@@ -4,6 +4,7 @@ import time
 
 import web
 from lxml import etree
+import datamodel.basic
 
 from datamodel.location import WeixinLocation
 from datamodel.user import WeixinUser
@@ -91,11 +92,20 @@ class WeiXin(object):
         etree.SubElement(music,'HQMusicUrl').text=etree.CDATA('http://%s/static/music01.mp3'%HOSTNAME)
         return new_root
     def On_event_subscribe(self,doc):
+        token=datamodel.basic.GetAccessToken()
+        userdata=datamodel.basic.GetUserInfo(token,self.from_user)
         with dbconfig.Session() as session:
             weixin_user=WeixinUser()
             weixin_user.openid=self.from_user
             weixin_user.last_recv_time=time.time()
             weixin_user.subscribe=1
+            weixin_user.province=userdata['province']
+            weixin_user.city=userdata['city']
+            weixin_user.headimgurl=userdata['headimgurl']
+            weixin_user.language=userdata['language']
+            weixin_user.country=userdata['country']
+            weixin_user.sex=userdata['sex']
+            weixin_user.nickname=userdata['nickname']
             session.merge(weixin_user)
             session.commit()
         scenceid=0
@@ -107,7 +117,7 @@ class WeiXin(object):
                 print(scenceid)
         new_root=self._buildReplyBase()
         etree.SubElement(new_root,'MsgType').text=etree.CDATA('text')
-        etree.SubElement(new_root,'Content').text=etree.CDATA(u'感谢您关注现场加,功能开发中,请期待(scenceid=%d)'%scenceid)
+        etree.SubElement(new_root,'Content').text=etree.CDATA(u'%s,感谢您关注现场加,功能开发中,请期待(scenceid=%d)'%(userdata['nickname'],scenceid))
         return new_root
     def On_event_unsubscribe(self):
         with dbconfig.Session() as session:

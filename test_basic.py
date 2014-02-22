@@ -9,7 +9,7 @@ print(token)
 #print(data)
 
 """msgbody={
-    "touser":'oSqzEjq0iMnEG0JurYFi9blHV1zk',
+    "touser":'oSqzEjiF9BSgYUG1RNlskESCrG4A',
     "msgtype":"text",
     "text":
     {
@@ -21,5 +21,5 @@ data=SendMessage(token,msgbody)
 print(data)"""
 
 print GetUserInfo(token,'oSqzEjq0iMnEG0JurYFi9blHV1zk')
-print GetUserWatch(token)
-print CreateQRCode(token,456,1800)
+#print GetUserWatch(token)
+print CreateQRCode(token,5667788,1800)

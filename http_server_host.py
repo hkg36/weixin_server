@@ -12,6 +12,9 @@ import dbconfig
 import tools.helper
 import re
 
+from jinja2 import Environment, FileSystemLoader
+jinja2_env = Environment(loader=FileSystemLoader('templates'))
+
 HOSTNAME='weixin.haomeiniu.com'
 
 utf8_parser = etree.XMLParser(encoding='utf-8')
@@ -68,6 +71,23 @@ class WeiXin(object):
             return self.On_event_unsubscribe()
         elif event=='SCAN':
             return self.On_event_scan(doc)
+    def on_menu_ABOUTEVENT(self):
+        new_root=self._buildReplyBase()
+        etree.SubElement(new_root,'MsgType').text=etree.CDATA('news')
+        etree.SubElement(new_root,'ArticleCount').text=str(4)
+        Articles=etree.SubElement(new_root,'Articles')
+        self._add_picture_articles(Articles,u"美女",u'美女1','http://s.doyo.cn/img/52/56/7e7c9e9e78e26a000009.jpg','http://%s'%HOSTNAME)
+        self._add_picture_articles(Articles,u"美女",u'美女2','http://s.doyo.cn/img/52/f5/e2cc9e9e78646700000f.jpg','http://%s'%HOSTNAME)
+        self._add_picture_articles(Articles,u"美女",u'美女3','http://s1.doyo.cn/img/53/01/6f079e9e782a1d000001.jpg','http://%s'%HOSTNAME)
+        self._add_picture_articles(Articles,u"美女",u'美女4','http://s2.doyo.cn/img/52/e0/da939e9e786c7c000005.jpg','http://%s'%HOSTNAME)
+
+        return new_root
+    def on_menu_WANTJOIN(self):
+        new_root=self._buildReplyBase()
+        etree.SubElement(new_root,'MsgType').text=etree.CDATA('text')
+        etree.SubElement(new_root,'Content').text=etree.CDATA(u'<a href="http://weixin.haomeiniu.com/event/startjoin?openid=%s">点我开始报名</a>'%self.from_user)
+        return new_root
+
     def on_menu_ABOUT(self):
         new_root=self._buildReplyBase()
         etree.SubElement(new_root,'MsgType').text=etree.CDATA('text')
@@ -182,8 +202,20 @@ class WeiXin(object):
         etree.SubElement(new_root,'MsgType').text=etree.CDATA('text')
         etree.SubElement(new_root,'Content').text=etree.CDATA(u'你想说:%s'%text)
         return new_root
+class StartJoin(object):
+    def GET(self):
+        params=web.input()
+        openid=params.get('openid',None)
+        with dbconfig.Session() as session:
+            weixin_user=session.query(WeixinUser).filter(WeixinUser.openid==openid).first()
+            if weixin_user:
+                tpl=jinja2_env.get_template('startjoin.html')
+                return tpl.render(user_name=weixin_user.nickname,user_sex=weixin_user.sex,openid=openid)
+    def POST(self):
+        pass
 urls = (
     '/weixin', WeiXin,
+    '/event/startjoin',StartJoin,
     )
 webapp=web.application(urls, globals())
 if __name__ == '__main__' :

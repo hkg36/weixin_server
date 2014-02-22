@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>手机测试</title>
+</head>
+<body>
+<script type="text/javascript" src="../static/script/json2.js"></script>
+<script type="text/javascript" src="../static/script/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+    document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
+        WeixinJSBridge.on('menu:share:appmessage', function(argv){
+                        WeixinJSBridge.invoke('sendAppMessage',{
+                                              "appid"      : "",
+                                              "img_url"    : "http://163.54114.com/upimg/allimg/120918/5-12091Q64133.jpg",
+                                              "img_width"  : "640",
+                                              "img_height" : "640",
+                                              "link"       : "http://163.54114.com/",
+                                              "desc"       : "美女抱回家",
+                                              "title"      : "看美女"
+                        }, function(res) {
+                        });
+            });
+    });
+</script>
+欢迎参加,<b>{{ user_name }}</b>
+{% if user_sex==1 %}
+先生
+{% elif user_sex==2 %}
+小姐
+{% endif %},
+如果您要报名活动,请填写您的手机号,我们会联系您
+<form>
+    <input type="hidden" value="{{ openid }}" name="openid">
+    <input type="text" name="phone">
+    <input type="submit">
+</form>
+</body>
+</html>

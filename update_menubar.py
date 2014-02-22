@@ -2,11 +2,6 @@
 import urllib2
 import json
 from datamodel.basic import *
-
-"""
-会员专区 会员注册 会员福利 门店查询 我的订单
-辣妈课程 热门活动 宝贝课程 妈妈教室 孕妈故事
-微型杂志 宝贝故事 童言无忌
 """
 menu_body= {
      "button":[
@@ -64,7 +59,26 @@ menu_body= {
                "url":"http://quan.qgc.qq.com/177147127"
        }]
  }
-
+"""
+menu_body={
+    "button":[
+        {
+            "type":"click",
+            "name":u"关于活动",
+            "key":"ABOUTEVENT"
+        },
+        {
+            "type":"click",
+            "name":u"我要参与",
+            "key":"WANTJOIN"
+        },
+        {
+            "type":"click",
+            "name":u"我要推荐",
+            "key":"WANTJOIN"
+        },
+    ]
+}
 token=GetAccessToken()
 print DeleteMemu(token)
 print SetMenu(token,menu_body)

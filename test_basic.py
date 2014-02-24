@@ -22,4 +22,4 @@ print(data)"""
 
 print GetUserInfo(token,'oSqzEjq0iMnEG0JurYFi9blHV1zk')
 #print GetUserWatch(token)
-print CreateQRCode(token,5667788,1800)
+#print CreateQRCode(token,5667788,1800)

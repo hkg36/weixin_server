@@ -8,6 +8,7 @@ import datamodel.basic
 
 from datamodel.location import WeixinLocation
 from datamodel.user import WeixinUser
+from datamodel.userinfo import WeixinRealUser
 import dbconfig
 import tools.helper
 import re
@@ -212,7 +213,20 @@ class StartJoin(object):
                 tpl=jinja2_env.get_template('startjoin.html')
                 return tpl.render(user_name=weixin_user.nickname,user_sex=weixin_user.sex,openid=openid)
     def POST(self):
-        pass
+        params=web.input()
+        openid=params.get('openid',None)
+        phone=params.get('phone',None)
+        if openid is None:
+            return "not login"
+        if not phone:
+            return "not phone"
+        with dbconfig.Session() as session:
+            ruser=WeixinRealUser()
+            ruser.openid=openid
+            ruser.phone=phone
+            session.merge(ruser)
+            session.commit()
+        return "phone recorded"
 urls = (
     '/weixin', WeiXin,
     '/event/startjoin',StartJoin,

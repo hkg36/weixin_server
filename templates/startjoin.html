@@ -23,6 +23,17 @@
                         });
             });
     });
+    function weixinAddContact(name){
+        WeixinJSBridge.invoke("addContact", {webtype: "1",username: name}, function(e) {
+            WeixinJSBridge.log(e.err_msg);
+            //e.err_msg:add_contact:added 已经添加
+            //e.err_msg:add_contact:cancel 取消添加
+            //e.err_msg:add_contact:ok 添加成功
+            if(e.err_msg == 'add_contact:added' || e.err_msg == 'add_contact:ok'){
+                //关注成功，或者已经关注过
+            }
+        })
+    }
 </script>
 欢迎参加,<b>{{ user_name }}</b>
 {% if user_sex==1 %}
@@ -31,7 +42,7 @@
 小姐
 {% endif %},
 如果您要报名活动,请填写您的手机号,我们会联系您
-<form>
+<form method="post">
     <input type="hidden" value="{{ openid }}" name="openid">
     <input type="text" name="phone">
     <input type="submit">

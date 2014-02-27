@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<meta name="format-detection" content="telephone=no" />
+<title>无标题文档</title>
+
+<link rel="stylesheet" href="/static/css/jquery.mobile-1.3.2.min.css" />
+<script src="/static/js/jquery.js"></script>
+<script src="/static/js/jquery.mobile-1.3.2.min.js"></script>
+<script type="text/javascript">
+function checkMobile(){
+    var sMobile = document.mainform.phone.value
+    if(!(/^1[3|4|5|8][0-9]\d{4,8}$/.test(sMobile))){
+        alert("不是完整的11位手机号或者正确的手机号前七位");
+        document.mobileform.mobile.focus();
+        return false;
+    }
+    return true
+}
+</script>
+</head>
+
+<body>
+<div data-role="page" id="page1">
+    <div data-role="content">
+        <div data-role="fieldcontain">
+            <label>欢迎参加,<b>{{ user_name }}</b>
+{% if user_sex==1 %}
+先生
+{% elif user_sex==2 %}
+小姐
+{% endif %},
+如果您要报名活动,请填写您的手机号,我们会联系您</label>
+            <form method="post" name="mainform">
+            <label for="textinput1">
+                手机号：
+            </label>
+            <input type="hidden" value="{{ openid }}" name="openid">
+            <input id="textinput1" type="text" name="phone">
+             </form>
+        </div>
+        <a data-role="button" data-theme="b" href="#page1" onclick="if(checkMobile())document.mainform.submit()">
+            参与
+        </a>
+    </div>
+</div>
+</body>
+</html>

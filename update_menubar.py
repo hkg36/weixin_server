@@ -63,20 +63,24 @@ menu_body= {
 menu_body={
     "button":[
         {
-            "type":"click",
-            "name":u"关于活动",
-            "key":"ABOUTEVENT"
+            "type":"view",
+            "name":u"社区生活",
+            "url":"http://wx.wsq.qq.com/177147127"
         },
         {
-            "type":"click",
-            "name":u"我要参与",
-            "key":"WANTJOIN"
-        },
-        {
-            "type":"click",
-            "name":u"我要推荐",
-            "key":"WANTJOIN"
-        },
+            "name":u"活动介绍",
+            "sub_button":[
+            {
+                "type":"click",
+                "name":u"关于活动",
+                "key":"ABOUTEVENT"
+            },
+            {
+                "type":"click",
+                "name":u"参与活动",
+                "key":"WANTJOIN"
+            }]
+        }
     ]
 }
 token=GetAccessToken()

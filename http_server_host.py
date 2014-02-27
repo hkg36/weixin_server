@@ -1,4 +1,4 @@
-#-*-coding:utf-8-*-
+#coding:utf-8
 import hashlib
 import time
 
@@ -210,7 +210,7 @@ class StartJoin(object):
         with dbconfig.Session() as session:
             weixin_user=session.query(WeixinUser).filter(WeixinUser.openid==openid).first()
             if weixin_user:
-                tpl=jinja2_env.get_template('startjoin.html')
+                tpl=jinja2_env.get_template('RecordPhone.html')
                 return tpl.render(user_name=weixin_user.nickname,user_sex=weixin_user.sex,openid=openid)
     def POST(self):
         params=web.input()
@@ -220,7 +220,20 @@ class StartJoin(object):
             return "not login"
         if not phone:
             return "not phone"
+
         with dbconfig.Session() as session:
+            wu=session.query(WeixinUser).filter(WeixinUser.openid==openid).first()
+            if wu:
+                token=datamodel.basic.GetAccessToken()
+                datamodel.basic.SendMessage(token,{
+                    "touser":wu.openid,
+                    "msgtype":"text",
+                    "text":
+                    {
+                         "content":u"%s%s 您想参与的活动 黄龙溪过夜，您的手机号：%s,我们会尽快联系您."%(wu.nickname,u"大哥" if wu.sex==1 else u"姐",phone )
+                    }
+                })
+
             ruser=WeixinRealUser()
             ruser.openid=openid
             ruser.phone=phone

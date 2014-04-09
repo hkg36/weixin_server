@@ -239,7 +239,7 @@ class StartJoin(object):
             ruser.phone=phone
             session.merge(ruser)
             session.commit()
-        return "phone recorded"
+        raise web.redirect('/static/joinsuccess.html')
 urls = (
     '/weixin', WeiXin,
     '/event/startjoin',StartJoin,

@@ -85,4 +85,4 @@ menu_body={
 }
 token=GetAccessToken()
 print DeleteMemu(token)
-print SetMenu(token,menu_body)
+#print SetMenu(token,menu_body)

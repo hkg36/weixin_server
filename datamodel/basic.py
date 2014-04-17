@@ -12,8 +12,8 @@ from cStringIO import StringIO
 
 register_openers()
 
-APPID='wx1ece1ba1edd153d8'
-APPSECRET='5430fab192812a77ea767d314adf9631'
+APPID='wx2cffd0c7bb254e6a'
+APPSECRET='7347dd97348c1cad2e9e5d409145fcf8'
 
 DBBase=declarative_base(name="WinxinBase")
 db=create_engine("sqlite:///data/weixinbase.sqlite")

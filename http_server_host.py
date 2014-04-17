@@ -20,7 +20,7 @@ HOSTNAME='weixin.haomeiniu.com'
 
 utf8_parser = etree.XMLParser(encoding='utf-8')
 class WeiXin(object):
-    token='2187hoijdsa7322'
+    token='dwajiosdjwia42309w531094'
     def GET(self):
         inputs=web.input()
         tmpArr=[self.token,inputs.timestamp,inputs.nonce]
@@ -157,7 +157,10 @@ class WeiXin(object):
         src_text=doc.xpath(r'//xml/Content/text()',smart_strings=False)[0]
         new_root=self._buildReplyBase()
         etree.SubElement(new_root,'MsgType').text=etree.CDATA('text')
-        etree.SubElement(new_root,'Content').text=etree.CDATA(u'RE:%s'%src_text)
+        if src_text=='id':
+            etree.SubElement(new_root,'Content').text=etree.CDATA(self.from_user)
+        else:
+            etree.SubElement(new_root,'Content').text=etree.CDATA(u'RE:%s'%src_text)
         return new_root
     def _add_picture_articles(self,Articles,Title,Description,PicUrl,Url):
         item=etree.SubElement(Articles,'item')

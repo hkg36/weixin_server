@@ -155,13 +155,32 @@ class WeiXin(object):
         return new_root
     def on_text(self,doc):
         src_text=doc.xpath(r'//xml/Content/text()',smart_strings=False)[0]
-        new_root=self._buildReplyBase()
-        etree.SubElement(new_root,'MsgType').text=etree.CDATA('text')
         if src_text=='id':
+            new_root=self._buildReplyBase()
+            etree.SubElement(new_root,'MsgType').text=etree.CDATA('text')
             etree.SubElement(new_root,'Content').text=etree.CDATA(self.from_user)
-        else:
-            etree.SubElement(new_root,'Content').text=etree.CDATA(u'RE:%s'%src_text)
-        return new_root
+            return new_root
+        elif src_text=='reg':
+            token=datamodel.basic.GetAccessToken()
+            userdata=datamodel.basic.GetUserInfo(token,self.from_user)
+            with dbconfig.Session() as session:
+                weixin_user=WeixinUser()
+                weixin_user.openid=self.from_user
+                weixin_user.last_recv_time=time.time()
+                weixin_user.subscribe=1
+                weixin_user.province=userdata['province']
+                weixin_user.city=userdata['city']
+                weixin_user.headimgurl=userdata['headimgurl']
+                weixin_user.language=userdata['language']
+                weixin_user.country=userdata['country']
+                weixin_user.sex=userdata['sex']
+                weixin_user.nickname=userdata['nickname']
+                session.merge(weixin_user)
+                session.commit()
+            new_root=self._buildReplyBase()
+            etree.SubElement(new_root,'MsgType').text=etree.CDATA('text')
+            etree.SubElement(new_root,'Content').text=etree.CDATA(u'%s,用户数据已更新'%(userdata['nickname']))
+            return new_root
     def _add_picture_articles(self,Articles,Title,Description,PicUrl,Url):
         item=etree.SubElement(Articles,'item')
         etree.SubElement(item,'Title').text=etree.CDATA(Title)

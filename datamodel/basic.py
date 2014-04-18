@@ -15,32 +15,12 @@ register_openers()
 APPID='wx2cffd0c7bb254e6a'
 APPSECRET='7347dd97348c1cad2e9e5d409145fcf8'
 
-DBBase=declarative_base(name="WinxinBase")
-db=create_engine("sqlite:///data/weixinbase.sqlite")
-class WeixinAccessToken(DBBase):
-    __tablename__ = 'weixin_access_token'
-    appid=Column(String(32),primary_key=True,nullable=False)
-    access_token=Column(String(256),nullable=False)
-    expires=Column(Integer,nullable=False)
-DBBase.metadata.create_all(db)
-Session = sessionmaker(bind=db,autocommit=False,autoflush=False,class_=AutoSession)
 
 def GetAccessToken():
-    return __get_weixin_token(APPID,APPSECRET)
-def __get_weixin_token(appid,appsecret):
-    with Session() as session:
-        weixin_token=session.query(WeixinAccessToken).filter(and_(WeixinAccessToken.appid==appid,WeixinAccessToken.expires>time.time())).first()
-        if weixin_token:
-            return weixin_token.access_token
-        resbody=urllib2.urlopen('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s'%(appid,appsecret)).read()
-        data=json.loads(resbody)
-        weixin_token=WeixinAccessToken()
-        weixin_token.appid=appid
-        weixin_token.access_token=data['access_token']
-        weixin_token.expires=time.time()+data['expires_in']-100
-        session.merge(weixin_token)
-        session.commit()
-        return weixin_token.access_token
+    return get_weixin_token(APPID,APPSECRET)
+def get_weixin_token(appid,appsecret):
+    res=urllib2.urlopen("http://service.laixinle.com/weixin/now_access_token?appid=%s&appsecret=%s"%(appid,appsecret))
+    return res.read()
 def PostFile(token,file,type='image'):
     datagen, headers = multipart_encode({"media": open(file, "rb")})
     request = urllib2.Request("http://file.api.weixin.qq.com/cgi-bin/media/upload?access_token=%s&type=%s"%(token,type), datagen, headers)

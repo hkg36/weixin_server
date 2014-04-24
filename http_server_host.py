@@ -12,6 +12,7 @@ from datamodel.userinfo import WeixinRealUser
 import dbconfig
 import tools.helper
 import re
+import datetime
 
 from jinja2 import Environment, FileSystemLoader
 jinja2_env = Environment(loader=FileSystemLoader('templates'))
@@ -210,6 +211,7 @@ class WeiXin(object):
             wloc.lat=lat
             wloc.long=long
             wloc.prec=prec
+            wloc.add_time=datetime.datetime.now()
             wloc.geokey=tools.helper.CombineGeo(long,lat)
             session.merge(wloc)
             session.commit()
